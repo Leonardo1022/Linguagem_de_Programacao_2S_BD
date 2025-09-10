@@ -18,4 +18,4 @@
 <img width="913" height="392" alt="image" src="https://github.com/user-attachments/assets/f0e5fd09-9568-4d8d-b91e-c823440c28ae" />
 
 # 7. Cálculo da mádia em Java
-[código do programa aqui](CalculoNota.xlsx)
+[código do programa aqui](https://github.com/Leonardo1022/Adriana_2S_BD/blob/main/E1/CalculoMedia/src/main/java/Media.java)
