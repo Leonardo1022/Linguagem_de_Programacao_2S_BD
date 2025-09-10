@@ -17,5 +17,8 @@
 # 5. Vídeo
 <img width="913" height="392" alt="image" src="https://github.com/user-attachments/assets/f0e5fd09-9568-4d8d-b91e-c823440c28ae" />
 
-# 7. Cálculo da mádia em Java
+# 7. Cálculo da média em Java
 [código do programa aqui](https://github.com/Leonardo1022/Adriana_2S_BD/blob/main/E1/CalculoMedia/src/main/java/Media.java)
+
+# 8. Classes dos itens 2, 3, 4 e 5 em Java
+[Código do programa com as classes aqui](https://github.com/Leonardo1022/Adriana_2S_BD/tree/main/E1/ClassesItem8)
