@@ -4,10 +4,10 @@ public class Main {
     public static void main(String[] args) {
         Som som = new Som();
         Pessoa pessoa = new Pessoa();
-        Instrumento instrumento = new Instrumento();
+        //Instrumento instrumento = new Instrumento();
 
         som.entreterPublico();
         pessoa.andar();
-        instrumento.tocar();
+        //instrumento.tocar();
     }
 }
