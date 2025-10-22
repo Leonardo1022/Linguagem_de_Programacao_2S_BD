@@ -9,10 +9,10 @@
 <img width="869" height="505" alt="image" src="https://github.com/user-attachments/assets/e99142f6-e09b-432c-a3ea-6102de93b200" />
 
 # 3. Imagem (Vik Muniz)
-<img width="817" height="558" alt="image" src="https://github.com/user-attachments/assets/77ab656d-54f2-4f0e-8267-d3ac16b939b7" />
+<img width="824" height="570" alt="image" src="https://github.com/user-attachments/assets/99387cbc-1a88-40dd-a2f2-c8534bdfcc82" />
 
 # 4. Imagem (Doodle)
-<img width="762" height="593" alt="image" src="https://github.com/user-attachments/assets/99c98030-53a2-4732-80c4-eec2159340ba" />
+<img width="804" height="596" alt="image" src="https://github.com/user-attachments/assets/45d4cd1a-4830-4a4b-99d3-0c671234d619" />
 
 # 5. Vídeo
 <img width="913" height="392" alt="image" src="https://github.com/user-attachments/assets/f0e5fd09-9568-4d8d-b91e-c823440c28ae" />
