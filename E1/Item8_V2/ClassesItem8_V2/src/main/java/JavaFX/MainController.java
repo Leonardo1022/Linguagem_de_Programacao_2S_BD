@@ -7,12 +7,23 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.collections.ObservableList;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class MainController {
     ///Img Doodle
@@ -50,7 +61,14 @@ public class MainController {
 
     ///Musica
     //Instrumento
-    @FXML public TextField tfAno_Veiculo;
+    @FXML public TextField tfTipo_Instrumento;
+
+    //Instrumento - painel
+    @FXML public AnchorPane apPainel_Instrumento;
+    @FXML public Button btn_Arquivo;
+    @FXML public ImageView ivFoto_Instrumento;
+    @FXML public Label lblMensagem;
+    @FXML public HBox hBoxMain11;
     //Pessoa
     @FXML public DatePicker dpNascimento_Pessoa;
 
@@ -231,7 +249,6 @@ public class MainController {
         } else {
             tbVoando_Passaro.setStyle("");
         }
-        System.out.println(tbVoando_Passaro.selectedProperty().getValue());
     }
 
     @FXML
@@ -268,6 +285,60 @@ public class MainController {
     }
 
     @FXML
-    private void criarSom() {}
+    private void criarSom() {
 
+    }
+    //Instrumento - painel
+    @FXML
+    private void abrirPainelImagem() {
+        apPainel_Instrumento.setVisible(true);
+        apPainel_Instrumento.setManaged(true);
+        hBoxMain11.setVisible(false);
+        hBoxMain11.setManaged(false);
+    }
+
+    @FXML
+    private void cancelarImagem() {
+        apPainel_Instrumento.setVisible(false);
+        apPainel_Instrumento.setManaged(false);
+        hBoxMain11.setVisible(true);
+        hBoxMain11.setManaged(true);
+    }
+
+    @FXML
+    private void salvarImagem() {
+        apPainel_Instrumento.setVisible(false);
+        apPainel_Instrumento.setManaged(false);
+        hBoxMain11.setVisible(true);
+        hBoxMain11.setManaged(true);
+    }
+    @FXML
+    private Image escolherImagem() {
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Adicionar Arquivo");
+        fc.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Imagem", "*.png", "*.jpeg", "*.webmp")
+        );
+
+        Stage stage = (Stage) btn_Arquivo.getScene().getWindow();
+        File arquivo_selecionado = fc.showOpenDialog(stage);
+
+        if(arquivo_selecionado != null) {
+            Path caminho_Arquivo = arquivo_selecionado.toPath();
+            Image imagem = new Image(String.valueOf(caminho_Arquivo.toFile()));
+            ivFoto_Instrumento.setImage(imagem);
+            lblMensagem.setText("Foto adicionada com sucesso!");
+            lblMensagem.setVisible(true);
+
+            ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+            Runnable atraso = () -> lblMensagem.setVisible(false);
+            executor.schedule(atraso, 4, TimeUnit.SECONDS);
+            executor.shutdown();
+            return imagem;
+
+        } else {
+            return null;
+        }
+    }
 }
+
