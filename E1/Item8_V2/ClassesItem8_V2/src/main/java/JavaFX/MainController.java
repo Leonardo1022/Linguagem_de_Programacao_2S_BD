@@ -4,7 +4,9 @@ import ImgDoodle.*;
 import ImgVikMuniz.*;
 
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.collections.ObservableList;
 import javafx.scene.image.Image;
@@ -27,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 
 public class MainController {
     ///Img Doodle
+    @FXML public AnchorPane apDoodle;
     //Animal
     @FXML public TextField tfNome_Animal;
     @FXML public TextField tfAlturaMetros_Animal;
@@ -37,8 +40,12 @@ public class MainController {
     //Bioma - Painel
     @FXML public AnchorPane pnPainelTabela;
     @FXML public TextField tfAnimais_Bioma;
+    @FXML public Button btnSalvar_Bioma;
+    @FXML public Button btn_Animais_Bioma;
+    @FXML public Button btnMusicas_Artista;
+    @FXML public Label lblTitulo_painelTabela;
     @FXML public ListView<String> lvLista;
-    @FXML public HBox hBoxMain;
+    @FXML public HBox hBoxDoodle;
     //Profissional
     @FXML public TextField tfCargo_Profissional;
     @FXML public CheckBox cbTrabalhando_Profissional;
@@ -60,6 +67,7 @@ public class MainController {
     @FXML public TextField tfModelo_Veiculo;
 
     ///Musica
+    @FXML public AnchorPane apMusica;
     //Instrumento
     @FXML public TextField tfTipo_Instrumento;
 
@@ -68,7 +76,7 @@ public class MainController {
     @FXML public Button btn_Arquivo;
     @FXML public ImageView ivFoto_Instrumento;
     @FXML public Label lblMensagem;
-    @FXML public HBox hBoxMain11;
+    @FXML public HBox hBoxMusica;
     //Pessoa
     @FXML public DatePicker dpNascimento_Pessoa;
 
@@ -157,32 +165,64 @@ public class MainController {
         tfAnimais_Bioma.clear();
     }
 
+    private void mudarVisibilidade(Node tela_principal, Node tela_secundaria, boolean para_tela_principal) {
+        if(para_tela_principal) {
+            tela_secundaria.setVisible(false);
+            tela_secundaria.setManaged(false);
+            tela_principal.setVisible(true);
+            tela_principal.setManaged(true);
+        } else {
+            tela_principal.setVisible(false);
+            tela_principal.setManaged(false);
+            tela_secundaria.setVisible(true);
+            tela_secundaria.setManaged(true);
+        }
+    }
+
     @FXML
-    private void abrirPainelTabela() {
+    private void abrirPainelTabela(ActionEvent event) {
         dados = FXCollections.observableArrayList();
         lvLista.setItems(dados);
-        pnPainelTabela.setVisible(true);
-        pnPainelTabela.setManaged(true);
-        hBoxMain.setVisible(false);
-        hBoxMain.setManaged(false);
+        if(event.getSource().equals(btn_Animais_Bioma)) {
+            try {
+                apMusica.getChildren().remove(pnPainelTabela);
+                apDoodle.getChildren().add(pnPainelTabela);
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+            mudarVisibilidade(hBoxDoodle, pnPainelTabela, false);
+        } else if(event.getSource().equals(btnMusicas_Artista)) {
+            try {
+                apDoodle.getChildren().remove(pnPainelTabela);
+                apMusica.getChildren().add(pnPainelTabela);
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+            mudarVisibilidade(hBoxMusica, pnPainelTabela, false);
+        }
+        //System.out.println(event.getSource().equals(btn_Animais_Bioma));
+        //System.out.println(event.getSource().equals(btnMusicas_Artista));
+        //btnMusicas_Artista.getParent();
     }
 
     @FXML
     private void fecharPainelTabela() {
-        pnPainelTabela.setVisible(false);
-        pnPainelTabela.setManaged(false);
-        hBoxMain.setVisible(true);
-        hBoxMain.setManaged(true);
+        if(!hBoxMusica.isVisible()) {
+            mudarVisibilidade(hBoxMusica, pnPainelTabela, true);
+        } else if(!hBoxDoodle.isVisible()) {
+            mudarVisibilidade(hBoxDoodle, pnPainelTabela, true);
+        }
         animais_List.clear();
     }
 
     @FXML
     private ArrayList<String> salvarListaAnimais() {
         animais_List.addAll(dados);
-        pnPainelTabela.setVisible(false);
-        pnPainelTabela.setManaged(false);
-        hBoxMain.setVisible(true);
-        hBoxMain.setManaged(true);
+        if(!hBoxMusica.isVisible()) {
+            mudarVisibilidade(hBoxMusica, pnPainelTabela, true);
+        } else if(!hBoxDoodle.isVisible()) {
+            mudarVisibilidade(hBoxDoodle, pnPainelTabela, true);
+        }
         return animais_List;
     }
 
@@ -291,26 +331,17 @@ public class MainController {
     //Instrumento - painel
     @FXML
     private void abrirPainelImagem() {
-        apPainel_Instrumento.setVisible(true);
-        apPainel_Instrumento.setManaged(true);
-        hBoxMain11.setVisible(false);
-        hBoxMain11.setManaged(false);
+        mudarVisibilidade(hBoxMusica, apPainel_Instrumento, false);
     }
 
     @FXML
     private void cancelarImagem() {
-        apPainel_Instrumento.setVisible(false);
-        apPainel_Instrumento.setManaged(false);
-        hBoxMain11.setVisible(true);
-        hBoxMain11.setManaged(true);
+        mudarVisibilidade(hBoxMusica, apPainel_Instrumento, true);
     }
 
     @FXML
     private void salvarImagem() {
-        apPainel_Instrumento.setVisible(false);
-        apPainel_Instrumento.setManaged(false);
-        hBoxMain11.setVisible(true);
-        hBoxMain11.setManaged(true);
+        mudarVisibilidade(hBoxMusica, apPainel_Instrumento, true);
     }
     @FXML
     private Image escolherImagem() {
