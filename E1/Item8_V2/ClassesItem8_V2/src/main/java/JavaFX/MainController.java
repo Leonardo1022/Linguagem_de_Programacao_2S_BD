@@ -18,8 +18,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -84,7 +82,7 @@ public class MainController {
     //Outros
     CSVCreator csv = new CSVCreator();
     ObservableList<String> dados;
-    ArrayList<String> animais_List = new ArrayList<>();
+    ArrayList<String> Lista_itens = new ArrayList<>();
 
     ///ImgDoodle
     @FXML
@@ -115,7 +113,7 @@ public class MainController {
     private void criarBioma() {
         String tipo = tfTipo_Bioma.getText();
         String temperatura = tfTemperatura_Bioma.getText();
-        ArrayList<String> animais = animais_List;
+        ArrayList<String> animais = Lista_itens;
 
         try {
             Bioma bioma = new Bioma(tipo, animais, Integer.parseInt(temperatura));
@@ -127,7 +125,7 @@ public class MainController {
             String csv_Linha = csv.criarLinhaCSV(bioma.getTipo(), bioma.getAnimais(), bioma.getTemperatura());
             csv.criarCSV(Bioma.class.getSimpleName(), csv_Linha, csv_cabecalho);
             tfTipo_Bioma.clear();
-            animais_List.clear();
+            Lista_itens.clear();
             tfTemperatura_Bioma.clear();
         }
         catch (Exception e) {
@@ -187,6 +185,7 @@ public class MainController {
             try {
                 apMusica.getChildren().remove(pnPainelTabela);
                 apDoodle.getChildren().add(pnPainelTabela);
+                lblTitulo_painelTabela.setText("Adicione os animais");
             } catch(Exception e) {
                 e.printStackTrace();
             }
@@ -195,6 +194,7 @@ public class MainController {
             try {
                 apDoodle.getChildren().remove(pnPainelTabela);
                 apMusica.getChildren().add(pnPainelTabela);
+                lblTitulo_painelTabela.setText("Adicione as músicas");
             } catch(Exception e) {
                 e.printStackTrace();
             }
@@ -212,18 +212,17 @@ public class MainController {
         } else if(!hBoxDoodle.isVisible()) {
             mudarVisibilidade(hBoxDoodle, pnPainelTabela, true);
         }
-        animais_List.clear();
+        Lista_itens.clear();
     }
 
     @FXML
-    private ArrayList<String> salvarListaAnimais() {
-        animais_List.addAll(dados);
+    private void salvarListaAnimais() {
+        Lista_itens.addAll(dados);
         if(!hBoxMusica.isVisible()) {
             mudarVisibilidade(hBoxMusica, pnPainelTabela, true);
         } else if(!hBoxDoodle.isVisible()) {
             mudarVisibilidade(hBoxDoodle, pnPainelTabela, true);
         }
-        return animais_List;
     }
 
     ///ImgVikMuniz
