@@ -3,6 +3,7 @@ module org.example.classesitem8_v3 {
     requires javafx.fxml;
     requires com.opencsv;
     requires javafx.graphics;
+    requires java.sql;
 
 
     opens JavaFX to javafx.fxml;
