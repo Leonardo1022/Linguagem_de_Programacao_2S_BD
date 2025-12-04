@@ -2,12 +2,12 @@ package Musica;
 
 public class Main {
     public static void main(String[] args) {
-        Som som = new Som();
-        Pessoa pessoa = new Pessoa();
-        //Instrumento instrumento = new Instrumento();
+        //Musica musica = new Musica();
+        //Artista artista = new Artista();
+        //Album instrumento = new Album();
 
-        som.entreterPublico();
-        pessoa.andar();
+        //musica.entreterPublico();
+        //artista.andar();
         //instrumento.tocar();
     }
 }

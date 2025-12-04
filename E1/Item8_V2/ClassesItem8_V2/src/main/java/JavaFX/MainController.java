@@ -2,10 +2,13 @@ package JavaFX;
 
 import ImgDoodle.*;
 import ImgVikMuniz.*;
+import Musica.*;
 
+import SqLite.MainDAO;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.collections.ObservableList;
@@ -14,18 +17,29 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.time.LocalDate;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Base64;
+import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class MainController {
+public class MainController implements Initializable {
     ///Img Doodle
     @FXML public AnchorPane apDoodle;
     //Animal
@@ -64,25 +78,65 @@ public class MainController {
     @FXML public ColorPicker cpCor_Veiculo;
     @FXML public TextField tfModelo_Veiculo;
 
-    ///Musica
+    ///Musica - Principal
     @FXML public AnchorPane apMusica;
-    //Instrumento
-    @FXML public TextField tfTipo_Instrumento;
-
-    //Instrumento - painel
-    @FXML public AnchorPane apPainel_Instrumento;
+    //Artista
+    @FXML public TextField tfNome_Artista;
+    //Música
+    @FXML public TextField tfNome_Musica;
+    @FXML public ComboBox<Artista> cbArtista_Musica;
+    @FXML public ComboBox<Album> cbAlbum_Musica;
+    //Música - painel
+    @FXML public AnchorPane apPainel_Player;
+    @FXML private WebView webView;
+    @FXML private TextField tfInput;
+    private WebEngine webEngine;
+    private static final String CLIENT_ID = ""; //Colocar
+    private static final String CLIENT_SECRET = "";
+    //Album
+    @FXML public TextField tfNome_Album;
+    @FXML public DatePicker dpData_Album;
+    @FXML public ComboBox<Artista> cbArtista_Album;
+    //Album - painel
+    @FXML public AnchorPane apPainel_Album;
     @FXML public Button btn_Arquivo;
-    @FXML public ImageView ivFoto_Instrumento;
+    @FXML public ImageView ivFoto_Album;
     @FXML public Label lblMensagem;
     @FXML public HBox hBoxMusica;
-    //Pessoa
-    @FXML public DatePicker dpNascimento_Pessoa;
 
 
     //Outros
     CSVCreator csv = new CSVCreator();
     ObservableList<String> dados;
     ArrayList<String> Lista_itens = new ArrayList<>();
+
+    //Vai ocorrer no início
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        apPainel_Player.setVisible(false);
+        apPainel_Player.setManaged(false);
+
+        try {
+            cbArtista_Musica.getItems().addAll(MainDAO.coletarArtistas());
+            cbArtista_Album.getItems().addAll(MainDAO.coletarArtistas());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        //Quando o ComboBox for selecionado faz isso
+        cbArtista_Musica.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((obs, oldVal, newVal) -> {
+                    try {
+                        cbAlbum_Musica.getItems().clear();
+                        cbAlbum_Musica.getItems().addAll(MainDAO.coletarAlbuns(cbArtista_Musica.getValue()));
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+    }
+
+    public MainController() {
+    }
 
     ///ImgDoodle
     @FXML
@@ -315,32 +369,56 @@ public class MainController {
 
     ///Musica
     @FXML
-    private void criarInstrumento() {}
+    private void criarArtista() throws SQLException {
+        Artista artista = new Artista(tfNome_Artista.getText());
+        MainDAO.inserirArtista(artista.toString());
+        cbArtista_Musica.getItems().add(artista);
+        cbArtista_Album.getItems().add(artista);
 
-    @FXML
-    private void criarPessoa() {
-        LocalDate nascimento = dpNascimento_Pessoa.getValue();
-
+        tfNome_Artista.clear();
+        System.out.println("Adicionado o artista com sucesso!");
     }
 
     @FXML
-    private void criarSom() {
+    private void criarMusica() throws SQLException {
+        Musica musica = new Musica(
+                tfNome_Musica.getText(),
+                cbArtista_Musica.getValue(),
+                cbAlbum_Musica.getValue()
+        );
+        tfNome_Musica.clear();
 
+        MainDAO.inserirMusica(musica);
+        System.out.println("Adicionado a música com sucesso!");
     }
-    //Instrumento - painel
+
+    @FXML
+    private void criarAlbum() throws SQLException {
+        Album album = new Album(
+                tfNome_Album.getText(),
+                ivFoto_Album.getImage(),
+                cbArtista_Album.getValue(),
+                dpData_Album.getValue()
+        );
+        tfNome_Album.clear();
+
+        MainDAO.inserirAlbum(album);
+        System.out.println("Adicionado o album com sucesso!");
+    }
+    //Album - painel
     @FXML
     private void abrirPainelImagem() {
-        mudarVisibilidade(hBoxMusica, apPainel_Instrumento, false);
+        mudarVisibilidade(hBoxMusica, apPainel_Album, false);
     }
 
     @FXML
     private void cancelarImagem() {
-        mudarVisibilidade(hBoxMusica, apPainel_Instrumento, true);
+        mudarVisibilidade(hBoxMusica, apPainel_Album, true);
     }
 
     @FXML
     private void salvarImagem() {
-        mudarVisibilidade(hBoxMusica, apPainel_Instrumento, true);
+        mudarVisibilidade(hBoxMusica, apPainel_Album, true);
     }
     @FXML
     private Image escolherImagem() {
@@ -356,7 +434,7 @@ public class MainController {
         if(arquivo_selecionado != null) {
             Path caminho_Arquivo = arquivo_selecionado.toPath();
             Image imagem = new Image(String.valueOf(caminho_Arquivo.toFile()));
-            ivFoto_Instrumento.setImage(imagem);
+            ivFoto_Album.setImage(imagem);
             lblMensagem.setText("Foto adicionada com sucesso!");
             lblMensagem.setVisible(true);
 
@@ -370,5 +448,113 @@ public class MainController {
             return null;
         }
     }
+
+    @FXML
+    private void abrirPainelPlayer() throws Exception {
+        mudarVisibilidade(hBoxMusica, apPainel_Player, false);
+        String input = tfNome_Musica.getText();
+        String codigo = searchTrack(input, getAccessToken()) + '"';
+        String html = """
+        <!DOCTYPE html>
+        <html>
+        <head>
+        <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+        </head>
+        <body style='margin:0;overflow: hidden;'>
+        <iframe style="border-radius:12px"
+        src="https://open.spotify.com/embed/track/""" + codigo + "\n" +
+        """
+        width="100%" height="100%" frameBorder="0"
+        allow="autoplay; clipboard-write; fullscreen; picture-in-picture">
+        </iframe>
+        </body>
+        </html>
+        """;
+        //System.out.println(html);
+        if(webEngine != webView.getEngine()) {
+            webEngine = webView.getEngine();
+            webEngine.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
+        }
+        webEngine.loadContent(html);
+        webEngine.setJavaScriptEnabled(true);
+    }
+
+    @FXML
+    private void fecharPainelPlayer() {
+        mudarVisibilidade(hBoxMusica, apPainel_Player, true);
+    }
+
+    public static String getAccessToken() throws Exception {
+
+        String auth = CLIENT_ID + ":" + CLIENT_SECRET;
+        String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes());
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://accounts.spotify.com/api/token"))
+                .header("Authorization", "Basic " + encodedAuth)
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .POST(HttpRequest.BodyPublishers.ofString("grant_type=client_credentials"))
+                .build();
+
+        HttpClient client = HttpClient.newHttpClient();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        String body = response.body();
+
+        // captura o access_token
+        int index = body.indexOf("access_token\":\"") + "access_token\":\"".length();
+        String token = body.substring(index, body.indexOf("\"", index));
+
+        return token;
+    }
+
+    public static String searchTrack(String query, String token) throws Exception {
+        //Query tratada para retirar espaços e caracteres especiais
+        String query_tratada = URLEncoder.encode(query, StandardCharsets.UTF_8);
+        //Quantidade de resultados retornados
+        String resultados = "3";
+
+        HttpRequest requisicao = HttpRequest.newBuilder()
+                //Cria uma requisição
+                .uri(URI.create("https://api.spotify.com/v1/search?q=" + query_tratada + "&type=track&limit=" + resultados))
+                //Dá o token para adquirir a resposta
+                .header("Authorization", "Bearer " + token)
+                //Finaliza a requisição
+                .build();
+
+        HttpClient client = HttpClient.newHttpClient();
+        //Manda a requisição e obtém a resposta
+        HttpResponse<String> resposta = client.send(requisicao, HttpResponse.BodyHandlers.ofString());
+        //Guarda a resposta numa ‘String’
+        String json = resposta.body();
+
+        System.out.println("\nJSON retornado:");
+        //Printa a json pura
+        System.out.println(json);
+
+        /// Extração simples (sem JSON parser)
+        //Verifica se a String possui a um vídeo preview
+        if (json.contains("https://open.spotify.com/track/")) {
+            //Marca a primeira ocorrência do trecho
+            int local = json.indexOf("https://open.spotify.com/track/") + "https://open.spotify.com/track/".length();
+            System.out.println(local);
+            String preview = json.substring(local, json.indexOf("\"", local + 1));
+            System.out.println("\npreview: " + preview);
+            return preview;
+        } else {
+            System.out.println("\nEssa música não possui preview.");
+        }
+        //Verifica se a String possui um id
+        if (json.contains("\"id\":\"")) {
+            int local = json.indexOf("id\":\"") + "id\":\"".length();
+            System.out.println(local);
+            String id = json.substring(local, json.indexOf("\"", local + 1));
+            System.out.println("\nid: " + id);
+        } else {
+            System.out.println("\nEssa música não possui ID.");
+        }
+        return null;
+    }
 }
+
 
